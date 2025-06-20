@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeeWrite AI - Visual Learning Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 SeeWrite AI</h1>
+            <p>Generative AI-Powered Learning for Visually Impaired Students</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <h2>📸 Upload Educational Content</h2>
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                    <div class="upload-content">
+                        <div class="upload-icon">📁</div>
+                        <p>Click to upload an image or drag and drop</p>
+                        <p class="upload-hint">Supported: JPG, PNG, GIF</p>
+                    </div>
+                </div>
+                <button id="processBtn" class="btn-primary" disabled>🔍 Analyze Image</button>
+            </section>
+
+            <section class="preview-section" id="previewSection" style="display: none;">
+                <h3>📋 Image Preview</h3>
+                <img id="imagePreview" alt="Uploaded image preview">
+            </section>
+
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <h3>🎵 Generated Description</h3>
+                <div class="description-container">
+                    <p id="descriptionText"></p>
+                    <div class="audio-controls">
+                        <audio id="audioPlayer" controls>
+                            Your browser does not support the audio element.
+                        </audio>
+                        <button id="replayBtn" class="btn-secondary">🔄 Replay</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="chat-section" id="chatSection" style="display: none;">
+                <h3>💬 Ask Follow-up Questions</h3>
+                <div class="chat-container">
+                    <div id="chatHistory" class="chat-history"></div>
+                    <div class="chat-input-container">
+                        <input type="text" id="questionInput" placeholder="Ask a question about the content..." maxlength="500">
+                        <button id="askBtn" class="btn-primary">📤 Ask</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="loading-section" id="loadingSection" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p id="loadingText">Processing your image...</p>
+            </section>
+        </main>
+
+        <footer>
+            <p>Powered by AWS Bedrock, Polly, and Rekognition | Built for AWS Hackathon 2025</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

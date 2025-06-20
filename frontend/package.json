@@ -1,0 +1,22 @@
+{
+  "name": "seewrite-ai-frontend",
+  "version": "1.0.0",
+  "description": "SeeWrite AI - Frontend for Generative AI-Powered Learning",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "accessibility",
+    "ai",
+    "education",
+    "aws",
+    "bedrock",
+    "polly"
+  ],
+  "author": "Moses Mue",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

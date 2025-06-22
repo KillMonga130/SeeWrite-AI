@@ -69,7 +69,7 @@ bedrock_body = {
 
 ## 🚀 Live Demo
 
-**🌐 Application URL**: https://main.d18meajjmvncn7.amplifyapp.com
+**🌐 Application URL**: [https://main.d18meajjmvncn7.amplifyapp.com](https://staging.dpxxetllhquer.amplifyapp.com/)
 
 ### Demo Images Available:
 - **Mathematics**: Pythagorean theorem diagrams
@@ -79,7 +79,7 @@ bedrock_body = {
 
 ## 🧪 How to Test
 
-1. **Visit**: https://main.d18meajjmvncn7.amplifyapp.com
+1. **Visit**: [https://main.d18meajjmvncn7.amplifyapp.com](https://staging.dpxxetllhquer.amplifyapp.com/)
 2. **Upload**: Any educational image (JPG, PNG, GIF up to 10MB)
 3. **Listen**: AI-generated detailed audio description
 4. **Interact**: Ask follow-up questions like:

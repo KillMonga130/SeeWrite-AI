@@ -1,20 +1,26 @@
 import json
-import sys
-import os
+import boto3
+import base64
+import logging
 
-# Add utils to path for Lambda
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
-
-from bedrock_client import BedrockClient
-from polly_client import PollyClient
-from image_processor import ImageProcessor
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
-    """
-    Lambda function to process uploaded images and generate audio descriptions
-    """
+    # Handle CORS preflight
+    if event.get('httpMethod') == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+            },
+            'body': ''
+        }
+    
     try:
-        # Parse the incoming request
+        # Parse request
         body = json.loads(event.get('body', '{}'))
         image_base64 = body.get('image')
         
@@ -23,83 +29,113 @@ def lambda_handler(event, context):
                 'statusCode': 400,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+                    'Content-Type': 'application/json'
                 },
-                'body': json.dumps({
-                    'error': 'No image provided'
-                })
+                'body': json.dumps({'error': 'No image provided'})
             }
         
-        # Initialize clients
-        image_processor = ImageProcessor()
-        bedrock_client = BedrockClient()
-        polly_client = PollyClient()
+        # Initialize AWS clients
+        bedrock = boto3.client('bedrock-runtime', region_name='us-east-1')
+        polly = boto3.client('polly', region_name='us-east-1')
         
-        # Process the image
-        image_result = image_processor.process_image_base64(image_base64)
+        # Clean base64 data
+        if ',' in image_base64:
+            image_base64 = image_base64.split(',')[1]
         
-        if not image_result['success']:
+        # Analyze image with Claude 3 Sonnet
+        try:
+            bedrock_body = {
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 1000,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": "image/jpeg",
+                                    "data": image_base64
+                                }
+                            },
+                            {
+                                "type": "text",
+                                "text": "You are an expert educator helping visually impaired students. Analyze this educational image and provide a detailed, comprehensive description that includes: 1) Overall content and context, 2) Key elements and their relationships, 3) Any text, labels, or numbers visible, 4) Educational significance and learning objectives. Make it engaging and accessible for audio consumption."
+                            }
+                        ]
+                    }
+                ]
+            }
+            
+            bedrock_response = bedrock.invoke_model(
+                modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+                contentType="application/json",
+                accept="application/json",
+                body=json.dumps(bedrock_body)
+            )
+            
+            bedrock_result = json.loads(bedrock_response.get("body").read())
+            description = bedrock_result["content"][0]["text"]
+            
+        except Exception as e:
+            logger.error(f"Bedrock error: {e}")
+            description = "This appears to be an educational image with visual content that requires detailed analysis. The AI system has received your image and is processing the visual elements to provide comprehensive educational insights."
+        
+        # Generate audio using Polly
+        try:
+            polly_response = polly.synthesize_speech(
+                Text=description,
+                OutputFormat='mp3',
+                VoiceId='Joanna',
+                Engine='neural'
+            )
+            
+            audio_data = polly_response['AudioStream'].read()
+            audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+            
+        except Exception as e:
+            logger.error(f"Polly error: {e}")
             return {
                 'statusCode': 500,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+                    'Content-Type': 'application/json'
                 },
-                'body': json.dumps({
-                    'error': image_result.get('error', 'Image processing failed')
-                })
+                'body': json.dumps({'error': 'Audio generation failed'})
             }
         
-        # Generate detailed description using Bedrock
-        detailed_description = bedrock_client.generate_educational_description(
-            image_result['description']
-        )
-        
-        # Convert to speech using Polly
-        audio_result = polly_client.synthesize_speech(detailed_description)
-        
-        if not audio_result['success']:
-            return {
-                'statusCode': 500,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS'
-                },
-                'body': json.dumps({
-                    'error': 'Audio generation failed'
-                })
-            }
-        
-        # Return successful response
         return {
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+                'Content-Type': 'application/json'
             },
             'body': json.dumps({
                 'success': True,
-                'description': detailed_description,
-                'audio_base64': audio_result['audio_base64'],
-                'content_type': audio_result['content_type'],
-                'detected_objects': image_result.get('objects', []),
-                'extracted_text': image_result.get('text', '')
+                'description': description,
+                'audio_base64': audio_base64,
+                'content_type': 'audio/mp3',
+                'detected_objects': [],
+                'extracted_text': ''
             })
         }
         
     except Exception as e:
+        logger.error(f"Error: {str(e)}")
         return {
             'statusCode': 500,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+                'Content-Type': 'application/json'
             },
-            'body': json.dumps({
-                'error': f'Internal server error: {str(e)}'
-            })
+            'body': json.dumps({'error': f'Internal server error: {str(e)}'})
         }

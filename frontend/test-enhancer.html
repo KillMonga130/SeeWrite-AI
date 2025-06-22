@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Enhancer Test</title>
+    <link rel="stylesheet" href="text-enhancer.css">
+</head>
+<body>
+    <div id="test-container"></div>
+    
+    <script src="text-enhancer.js"></script>
+    <script>
+        // Test the enhancer
+        const testText = "This diagram presents a comprehensive framework for 6G networks with AI algorithms and ML models.";
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.textEnhancer) {
+                console.log('✅ Text enhancer loaded');
+                window.textEnhancer.enhanceText(testText, document.getElementById('test-container'));
+            } else {
+                console.log('❌ Text enhancer not loaded');
+                document.getElementById('test-container').innerHTML = '<p style="color: red;">Text enhancer failed to load</p>';
+            }
+        });
+    </script>
+</body>
+</html>

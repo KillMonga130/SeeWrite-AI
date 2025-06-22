@@ -1,0 +1,36 @@
+# SeeWrite AI - Python Dependencies
+# These dependencies are automatically available in AWS Lambda Python runtime
+
+# Core AWS SDK
+boto3>=1.34.0
+botocore>=1.34.0
+
+# JSON handling (built-in)
+# json
+
+# Base64 encoding (built-in)
+# base64
+
+# Logging (built-in)
+# logging
+
+# Note: AWS Lambda Python 3.11 runtime includes these packages by default:
+# - boto3 (AWS SDK for Python)
+# - botocore (Low-level AWS service access)
+# - urllib3 (HTTP client)
+# - requests (HTTP library)
+# - certifi (SSL certificates)
+# - chardet (Character encoding detection)
+# - idna (Internationalized domain names)
+# - six (Python 2/3 compatibility)
+# - python-dateutil (Date/time utilities)
+# - jmespath (JSON query language)
+# - s3transfer (S3 transfer utilities)
+
+# For local development and testing:
+# pip install boto3 botocore
+
+# Additional packages for enhanced functionality (if needed):
+# Pillow>=10.0.0  # Image processing (if image manipulation needed)
+# numpy>=1.24.0   # Numerical computing (if advanced processing needed)
+# pandas>=2.0.0   # Data analysis (if data processing needed)

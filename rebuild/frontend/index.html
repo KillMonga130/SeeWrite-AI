@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" role="document">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeeWrite AI - Revolutionary Educational Accessibility</title>
+    <meta name="description" content="AI-powered educational accessibility tool that converts images to audio descriptions with interactive Q&A">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-premium{background:linear-gradient(145deg,#ffffff 0%,#f8fafc 100%);box-shadow:0 20px 40px rgba(0,0,0,0.1),0 0 0 1px rgba(255,255,255,0.05)}
+        .hero-gradient{background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%)}
+        .upload-zone{transition:all 0.4s cubic-bezier(0.4,0,0.2,1)}
+        .upload-zone:hover{transform:translateY(-2px);box-shadow:0 25px 50px rgba(102,126,234,0.25)}
+        .processing-wave{background:linear-gradient(90deg,#667eea,#764ba2,#f093fb,#667eea);background-size:400% 400%;animation:wave 3s ease-in-out infinite}
+        @keyframes wave{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        .text-stream{opacity:0;transform:translateY(10px);animation:streamIn 0.6s ease-out forwards}
+        @keyframes streamIn{to{opacity:1;transform:translateY(0)}}
+        .pulse-ring{animation:pulseRing 2s cubic-bezier(0.455,0.03,0.515,0.955) infinite}
+        @keyframes pulseRing{0%{transform:scale(0.8);opacity:1}100%{transform:scale(2.4);opacity:0}}
+        .floating{animation:floating 3s ease-in-out infinite}
+        @keyframes floating{0%,100%{transform:translateY(0px)}50%{transform:translateY(-10px)}}
+        .glow-effect{box-shadow:0 0 20px rgba(102,126,234,0.3)}
+        .success-bounce{animation:successBounce 0.6s cubic-bezier(0.68,-0.55,0.265,1.55)}
+        @keyframes successBounce{0%{transform:scale(0.8)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+        .accessibility-panel { display: none; }
+        .accessibility-panel.show { display: block; }
+        .high-contrast { filter: contrast(150%) brightness(1.2); }
+        .large-text { font-size: 1.25em !important; line-height: 1.6 !important; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <header class="hero-gradient text-white py-16 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-10"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center mb-12">
+                <h1 class="text-6xl font-black mb-4 text-white">
+                    SeeWrite AI
+                </h1>
+                <p class="text-2xl font-light mb-8 text-white">
+                    Revolutionary Educational Accessibility Through AI
+                </p>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6 max-w-4xl mx-auto">
+                    <p class="text-lg font-medium text-white">
+                        <strong>AWS Breaking Barriers Challenge</strong> - Transforming visual learning barriers into opportunities through cutting-edge AI
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Process Flow -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+                <div class="text-center group">
+                    <div class="relative">
+                        <div class="pulse-ring absolute inset-0 border-2 border-white rounded-full opacity-30"></div>
+                        <i class="fas fa-camera text-3xl mb-2 relative z-10 group-hover:scale-110 transition-transform text-white"></i>
+                    </div>
+                    <p class="text-sm font-medium text-white">Capture</p>
+                </div>
+                <div class="text-center group">
+                    <div class="relative">
+                        <div class="pulse-ring absolute inset-0 border-2 border-white rounded-full opacity-30" style="animation-delay: 0.5s;"></div>
+                        <i class="fas fa-brain text-3xl mb-2 relative z-10 group-hover:scale-110 transition-transform text-white"></i>
+                    </div>
+                    <p class="text-sm font-medium text-white">Analyze</p>
+                </div>
+                <div class="text-center group">
+                    <div class="relative">
+                        <div class="pulse-ring absolute inset-0 border-2 border-white rounded-full opacity-30" style="animation-delay: 1s;"></div>
+                        <i class="fas fa-volume-up text-3xl mb-2 relative z-10 group-hover:scale-110 transition-transform text-white"></i>
+                    </div>
+                    <p class="text-sm font-medium text-white">Listen</p>
+                </div>
+                <div class="text-center group">
+                    <div class="relative">
+                        <div class="pulse-ring absolute inset-0 border-2 border-white rounded-full opacity-30" style="animation-delay: 1.5s;"></div>
+                        <i class="fas fa-comments text-3xl mb-2 relative z-10 group-hover:scale-110 transition-transform text-white"></i>
+                    </div>
+                    <p class="text-sm font-medium text-white">Interact</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <!-- Upload Section -->
+        <div class="card-premium rounded-3xl p-10 mb-12 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full opacity-10 transform translate-x-16 -translate-y-16"></div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center flex items-center justify-center">
+                <i class="fas fa-upload text-purple-600 mr-4 text-4xl"></i>Upload Your Educational Content
+            </h2>
+            
+            <div class="max-w-2xl mx-auto">
+                <div class="upload-zone card-premium border-2 border-dashed border-purple-300 rounded-2xl p-12 text-center cursor-pointer relative" role="button" tabindex="0" aria-label="Upload image area - click or press Enter to select image file">
+                    <input type="file" id="imageInput" accept="image/*" class="hidden" aria-describedby="upload-help">
+                    <label for="imageInput" class="cursor-pointer block">
+                        <i class="fas fa-cloud-upload-alt text-6xl text-purple-400 mb-4 floating"></i>
+                        <h3 class="text-xl font-bold text-gray-700 mb-2">Drop your image here or click to browse</h3>
+                        <p class="text-sm text-gray-400" id="upload-help">Supports JPG, PNG, GIF up to 10MB. Press Tab to navigate, Enter to select.</p>
+                    </label>
+                </div>
+                
+                <!-- Image Preview -->
+                <div id="imagePreview" class="mt-8 hidden">
+                    <div class="relative rounded-2xl overflow-hidden shadow-2xl">
+                        <img id="previewImg" alt="Preview of uploaded image" class="w-full h-auto max-h-96 object-contain bg-gray-100">
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex space-x-4 mt-8">
+                    <div class="flex-1 relative">
+                        <button id="processBtn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-8 rounded-xl hover:from-purple-700 hover:to-blue-700 font-bold text-lg transition-all transform hover:scale-105 shadow-lg focus:ring-4 focus:ring-purple-300" aria-describedby="process-help">
+                            <i class="fas fa-magic mr-3" aria-hidden="true"></i>Analyze with AI
+                        </button>
+                        <span id="process-help" class="sr-only">Analyze the uploaded image using AI to generate description and audio</span>
+                        <button id="clearBtn" class="bg-gray-500 text-white py-4 px-6 rounded-xl hover:bg-gray-600 transition-all transform hover:scale-105 focus:ring-4 focus:ring-gray-300" aria-label="Clear uploaded image">
+                            <i class="fas fa-times text-xl" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Status -->
+        <div id="processingStatus" class="processing-wave text-white rounded-3xl p-8 mb-12 text-center hidden">
+            <div class="flex items-center justify-center space-x-4 mb-4">
+                <div class="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div class="text-center">
+                    <h3 class="text-2xl font-bold mb-2">🧠 AI Analysis in Progress</h3>
+                    <p class="text-lg text-blue-100">Claude 3 Sonnet & Amazon Q are analyzing your educational content...</p>
+                    <div class="mt-4 flex justify-center space-x-2">
+                        <div class="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-white rounded-full animate-bounce" style="animation-delay: 0.1s;"></div>
+                        <div class="w-2 h-2 bg-white rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <!-- Description Card -->
+            <div class="card-premium rounded-3xl p-10 mb-12 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-green-400 to-blue-400 rounded-full opacity-10 transform -translate-x-20 -translate-y-20"></div>
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-eye text-blue-600 mr-4 text-4xl"></i>AI Visual Analysis
+                    </h3>
+                    <button id="playAudioBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-bold text-lg hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg glow-effect focus:ring-4 focus:ring-green-300" aria-describedby="audio-help">
+                        <i class="fas fa-play mr-2" aria-hidden="true"></i>🎧 Premium Audio
+                    </button>
+                    <span id="audio-help" class="sr-only">Play audio description of the analyzed image</span>
+                </div>
+                
+                <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 mb-6 border border-gray-100">
+                    <div id="descriptionText" class="text-gray-700 leading-relaxed text-lg min-h-[120px] prose prose-lg max-w-none" role="region" aria-label="AI generated image description" tabindex="0"></div>
+                </div>
+                
+                <audio id="audioPlayer" class="w-full mt-6 rounded-xl" controls style="display: none;" aria-label="Audio description of the image"></audio>
+                
+                <!-- Stats Display -->
+                <div class="grid grid-cols-3 gap-6 mt-8">
+                    <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl">
+                        <i class="fas fa-clock text-purple-600 text-2xl mb-2"></i>
+                        <div class="text-2xl font-bold text-purple-700" id="analysisTime">--</div>
+                        <div class="text-sm text-purple-600">Analysis Time</div>
+                    </div>
+                    <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl">
+                        <i class="fas fa-brain text-blue-600 text-2xl mb-2"></i>
+                        <div class="text-2xl font-bold text-blue-700" id="wordCount">--</div>
+                        <div class="text-sm text-blue-600">Words Generated</div>
+                    </div>
+                    <div class="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
+                        <i class="fas fa-volume-up text-green-600 text-2xl mb-2"></i>
+                        <div class="text-2xl font-bold text-green-700" id="audioLength">--</div>
+                        <div class="text-sm text-green-600">Audio Duration</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q&A Section -->
+            <div class="card-premium rounded-3xl p-10 relative overflow-hidden">
+                <div class="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full opacity-10 transform translate-x-16 translate-y-16"></div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-8 flex items-center">
+                    <i class="fas fa-comments text-purple-600 mr-4 text-4xl"></i>Interactive Q&A
+                </h3>
+                
+                <div class="flex space-x-4 mb-8">
+                    <div class="flex-1 relative">
+                        <input type="text" id="questionInput" placeholder="Ask about specific details, concepts, or explanations..." 
+                               class="w-full border-2 border-gray-200 rounded-xl px-6 py-4 text-lg focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all" 
+                               aria-label="Question input" aria-describedby="question-help">
+                        <span id="question-help" class="sr-only">Type your question about the image and press Enter or click Ask AI</span>
+                        <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
+                            <i class="fas fa-microphone text-gray-400 hover:text-purple-500 cursor-pointer transition-colors"></i>
+                        </div>
+                    </div>
+                    <button id="askBtn" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl hover:from-purple-700 hover:to-pink-700 font-bold text-lg transition-all transform hover:scale-105 shadow-lg focus:ring-4 focus:ring-purple-300" aria-describedby="ask-help">
+                        <i class="fas fa-paper-plane mr-2" aria-hidden="true"></i>Ask AI
+                    </button>
+                    <span id="ask-help" class="sr-only">Submit your question to get an AI response</span>
+                </div>
+
+                <!-- Quick Questions -->
+                <div class="mb-8">
+                    <p class="text-sm text-gray-600 mb-4 font-medium">💡 Quick responses:</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="quick-question bg-gradient-to-r from-blue-100 to-purple-100 hover:from-blue-200 hover:to-purple-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 transition-all transform hover:scale-105">
+                            What do you see?
+                        </button>
+                        <button class="quick-question bg-gradient-to-r from-green-100 to-blue-100 hover:from-green-200 hover:to-blue-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 transition-all transform hover:scale-105">
+                            Explain this to me
+                        </button>
+                        <button class="quick-question bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 transition-all transform hover:scale-105">
+                            Thank you
+                        </button>
+                        <button class="quick-question bg-gradient-to-r from-yellow-100 to-orange-100 hover:from-yellow-200 hover:to-orange-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 transition-all transform hover:scale-105">
+                            Help me understand
+                        </button>
+                        <button class="quick-question bg-gradient-to-r from-red-100 to-pink-100 hover:from-red-200 hover:to-pink-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 transition-all transform hover:scale-105">
+                            What colors are there?
+                        </button>
+                        <button class="quick-question bg-gradient-to-r from-indigo-100 to-blue-100 hover:from-indigo-200 hover:to-blue-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 transition-all transform hover:scale-105">
+                            How many items?
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat History -->
+                <div id="chatHistory" class="space-y-6 min-h-[200px] overflow-y-auto" style="max-height: none;" role="log" aria-live="polite" aria-label="Question and answer conversation history"></div>
+            </div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="errorDisplay" class="bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 text-red-700 rounded-3xl p-8 mb-12 hidden">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                <div>
+                    <h3 class="text-xl font-bold">Oops! Something went wrong</h3>
+                    <p id="errorMessage" class="text-lg"></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-gray-900 to-purple-900 text-white py-12 mt-20">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-4">SeeWrite AI</h3>
+                <p class="text-gray-300 text-lg max-w-2xl mx-auto">
+                    Breaking barriers in educational accessibility through revolutionary AI technology
+                </p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6 text-sm text-gray-400 mb-8">
+                <div class="flex items-center justify-center space-x-2">
+                    <i class="fas fa-brain text-purple-400"></i>
+                    <span>Powered by AWS Bedrock</span>
+                </div>
+                <div class="flex items-center justify-center space-x-2">
+                    <i class="fas fa-volume-up text-green-400"></i>
+                    <span>Amazon Polly Neural TTS</span>
+                </div>
+                <div class="flex items-center justify-center space-x-2">
+                    <i class="fas fa-cloud text-blue-400"></i>
+                    <span>Serverless Architecture</span>
+                </div>
+                <div class="flex items-center justify-center space-x-2">
+                    <i class="fas fa-graduation-cap text-orange-400"></i>
+                    <span>Amazon Q Enhanced</span>
+                </div>
+            </div>
+            <div class="text-gray-500">
+                <p>&copy; 2025 SeeWrite AI - Empowering accessible education through artificial intelligence</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -3,70 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SeeWrite AI - Visual Learning Assistant</title>
+    <title>SeeWrite AI - Your Intelligent Learning Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="accessibility.css">
+    <link rel="stylesheet" href="text-enhancer.css">
+    <link rel="stylesheet" href="canvas-generator.css">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🎓 SeeWrite AI</h1>
-            <p>Generative AI-Powered Learning for Visually Impaired Students</p>
-        </header>
-
-        <main>
-            <section class="upload-section">
-                <h2>📸 Upload Educational Content</h2>
-                <div class="upload-area" id="uploadArea">
-                    <input type="file" id="imageInput" accept="image/*" hidden>
-                    <div class="upload-content">
-                        <div class="upload-icon">📁</div>
-                        <p>Click to upload an image or drag and drop</p>
-                        <p class="upload-hint">Supported: JPG, PNG, GIF</p>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-eye text-3xl"></i>
+                    <div>
+                        <h1 class="text-3xl font-bold">SeeWrite AI</h1>
+                        <p class="text-blue-100">Your Intelligent Learning Companion</p>
                     </div>
                 </div>
-                <button id="processBtn" class="btn-primary" disabled>🔍 Analyze Image</button>
-            </section>
+                <div class="hidden md:flex items-center space-x-6">
+                    <div class="text-center">
+                        <i class="fas fa-camera text-2xl mb-1"></i>
+                        <p class="text-sm">Capture</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-brain text-2xl mb-1"></i>
+                        <p class="text-sm">Analyze</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-volume-up text-2xl mb-1"></i>
+                        <p class="text-sm">Listen</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-comments text-2xl mb-1"></i>
+                        <p class="text-sm">Interact</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
 
-            <section class="preview-section" id="previewSection" style="display: none;">
-                <h3>📋 Image Preview</h3>
-                <img id="imagePreview" alt="Uploaded image preview">
-            </section>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8" role="main" id="main-content">
+        <!-- Upload Section -->
+        <div class="card rounded-xl p-8 mb-8">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-3">Transform Visual Learning</h2>
+                <p class="text-gray-600 text-lg">Upload any educational image and experience premium AI-powered analysis with streaming text and on-demand audio</p>
+            </div>
+            
+            <div class="max-w-md mx-auto">
+                <div class="upload-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <input type="file" id="imageInput" accept="image/*" class="hidden" aria-describedby="upload-help">
+                    <label for="imageInput" class="cursor-pointer" role="button" tabindex="0">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600 mb-2">Click to upload an image</p>
+                        <p class="text-sm text-gray-400">Supports JPG, PNG, GIF up to 10MB</p>
+                        <div id="upload-help" class="sr-only">Press Enter or Space to select an image file for AI analysis</div>
+                    </label>
+                </div>
+                
+                <div id="imagePreview" class="mt-4 hidden">
+                    <img id="previewImg" class="w-full rounded-lg shadow-md" alt="Preview">
+                    <div class="mt-4 flex space-x-3">
+                        <button id="processBtn" class="btn flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 font-semibold" aria-describedby="analyze-help">
+                            <i class="fas fa-magic mr-2" aria-hidden="true"></i>Analyze Image
+                        </button>
+                        <div id="analyze-help" class="sr-only">Process the uploaded image with AI to generate detailed description and enable audio features</div>
+                        <button id="clearBtn" class="btn bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <section class="results-section" id="resultsSection" style="display: none;">
-                <h3>🎵 Generated Description</h3>
-                <div class="description-container">
-                    <p id="descriptionText"></p>
+        <!-- Processing Status -->
+        <div id="processingStatus" class="processing-indicator rounded-xl p-6 mb-8 hidden">
+            <div class="spinner"></div>
+            <div>
+                <h3 class="font-semibold text-blue-800 flex items-center">
+                    <i class="fas fa-brain mr-2"></i>AI Analysis in Progress
+                </h3>
+                <p class="text-blue-600 text-sm">🚀 Premium AI is examining your educational content with advanced vision models...</p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <!-- Enhanced Audio Description -->
+            <div class="card rounded-xl p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">
+                        <i class="fas fa-volume-up text-blue-600 mr-2"></i>Enhanced Analysis
+                    </h3>
                     <div class="audio-controls">
-                        <audio id="audioPlayer" controls>
-                            Your browser does not support the audio element.
-                        </audio>
-                        <button id="replayBtn" class="btn-secondary">🔄 Replay</button>
+                        <button id="playBtn" class="play-btn" title="Generate premium audio experience">
+                            <i class="fas fa-magic"></i>
+                        </button>
+                        <button id="pauseBtn" class="play-btn playing hidden">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <span class="text-xs text-purple-600 ml-2 font-medium">✨ Click for AI audio</span>
                     </div>
                 </div>
-            </section>
+                
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                    <div id="descriptionText" class="text-gray-700 leading-relaxed min-h-[100px]"></div>
+                </div>
+                
+                <div class="audio-player mt-4">
+                    <audio id="audioPlayer" class="w-full" controls></audio>
+                </div>
+            </div>
 
-            <section class="chat-section" id="chatSection" style="display: none;">
-                <h3>💬 Ask Follow-up Questions</h3>
-                <div class="chat-container">
-                    <div id="chatHistory" class="chat-history"></div>
-                    <div class="chat-input-container">
-                        <input type="text" id="questionInput" placeholder="Ask a question about the content..." maxlength="500">
-                        <button id="askBtn" class="btn-primary">📤 Ask</button>
+            <!-- Interactive Q&A -->
+            <div class="card rounded-xl p-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-comments text-purple-600 mr-2"></i>Ask Follow-up Questions
+                </h3>
+                
+                <div class="flex space-x-3 mb-6">
+                    <input type="text" id="questionInput" placeholder="Ask about specific details, labels, or concepts..." 
+                           class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           aria-label="Ask a question about the image" aria-describedby="question-help">
+                    <button id="askBtn" class="btn bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-semibold"
+                            aria-describedby="ask-help">
+                        <i class="fas fa-paper-plane mr-1" aria-hidden="true"></i>Ask
+                    </button>
+                </div>
+                <div id="question-help" class="sr-only">Type your question and press Enter or click Ask to get detailed explanations</div>
+                <div id="ask-help" class="sr-only">Submit your question to receive an AI-generated answer with optional audio</div>
+
+                <!-- Quick Questions -->
+                <div class="mb-6">
+                    <p class="text-sm text-gray-600 mb-3">Quick questions:</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="quick-question px-3 py-2 rounded-full text-sm">
+                            How does this work?
+                        </button>
+                        <button class="quick-question px-3 py-2 rounded-full text-sm">
+                            Why is this important?
+                        </button>
+                        <button class="quick-question px-3 py-2 rounded-full text-sm">
+                            What should I remember?
+                        </button>
                     </div>
                 </div>
-            </section>
 
-            <section class="loading-section" id="loadingSection" style="display: none;">
-                <div class="loading-spinner"></div>
-                <p id="loadingText">Processing your image...</p>
-            </section>
-        </main>
+                <!-- Chat History -->
+                <div id="chatHistory" class="space-y-4 max-h-96 overflow-y-auto" role="log" aria-label="Question and answer conversation" aria-live="polite"></div>
+            </div>
+        </div>
 
-        <footer>
-            <p>Powered by AWS Bedrock, Polly, and Rekognition | Built for AWS Hackathon 2025</p>
-        </footer>
-    </div>
+        <!-- Error Display -->
+        <div id="errorDisplay" class="error-message rounded-xl p-6 mb-8 hidden">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-exclamation-triangle text-xl"></i>
+                <div>
+                    <h3 class="font-semibold">Error</h3>
+                    <p id="errorMessage" class="text-sm"></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-2">SeeWrite AI</h3>
+                <p class="text-gray-400">Breaking barriers in educational accessibility through AI</p>
+            </div>
+            <div class="flex justify-center space-x-6 text-sm text-gray-400">
+                <span><i class="fas fa-brain mr-1"></i>Powered by AWS Bedrock</span>
+                <span><i class="fas fa-volume-up mr-1"></i>Amazon Polly</span>
+                <span><i class="fas fa-cloud mr-1"></i>Serverless Architecture</span>
+            </div>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="text-enhancer.js"></script>
+    <script src="canvas-generator.js"></script>
 </body>
 </html>

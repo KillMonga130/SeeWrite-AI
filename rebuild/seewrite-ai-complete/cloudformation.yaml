@@ -1,0 +1,312 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'SeeWrite AI - Complete Serverless Infrastructure for Educational Accessibility'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: 'seewrite-ai'
+    Description: 'Name of the project for resource naming'
+  
+  Environment:
+    Type: String
+    Default: 'prod'
+    AllowedValues: ['dev', 'staging', 'prod']
+    Description: 'Environment name'
+
+Resources:
+  # IAM Role for Lambda Functions
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-lambda-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: BedrockAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource: 
+                  - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0'
+        - PolicyName: PollyAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - polly:SynthesizeSpeech
+                Resource: '*'
+
+  # Lambda Function: Image Processor
+  ImageProcessorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-image-processor-${Environment}'
+      Runtime: python3.11
+      Handler: image_processor.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          # Placeholder - replace with actual code during deployment
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'Function placeholder'}
+      Timeout: 60
+      MemorySize: 1024
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          PROJECT_NAME: !Ref ProjectName
+
+  # Lambda Function: Q&A Chat
+  QChatFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-q-chat-${Environment}'
+      Runtime: python3.11
+      Handler: q_chat.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          # Placeholder - replace with actual code during deployment
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'Function placeholder'}
+      Timeout: 45
+      MemorySize: 512
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          PROJECT_NAME: !Ref ProjectName
+
+  # Lambda Function: Audio Generator
+  AudioGeneratorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-audio-generator-${Environment}'
+      Runtime: python3.11
+      Handler: audio_generator.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          # Placeholder - replace with actual code during deployment
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'Function placeholder'}
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          PROJECT_NAME: !Ref ProjectName
+
+  # API Gateway REST API
+  SeeWriteAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub '${ProjectName}-api-${Environment}'
+      Description: 'SeeWrite AI REST API for educational accessibility'
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # API Gateway Resources and Methods
+  ProcessImageResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      ParentId: !GetAtt SeeWriteAPI.RootResourceId
+      PathPart: 'process-image'
+
+  ProcessImageMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      ResourceId: !Ref ProcessImageResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImageProcessorFunction.Arn}/invocations'
+
+  ProcessImageOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      ResourceId: !Ref ProcessImageResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  ChatResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      ParentId: !GetAtt SeeWriteAPI.RootResourceId
+      PathPart: 'chat'
+
+  ChatMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      ResourceId: !Ref ChatResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${QChatFunction.Arn}/invocations'
+
+  ChatOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      ResourceId: !Ref ChatResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  GenerateAudioResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      ParentId: !GetAtt SeeWriteAPI.RootResourceId
+      PathPart: 'generate-audio'
+
+  GenerateAudioMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      ResourceId: !Ref GenerateAudioResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AudioGeneratorFunction.Arn}/invocations'
+
+  GenerateAudioOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      ResourceId: !Ref GenerateAudioResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # Lambda Permissions for API Gateway
+  ImageProcessorPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ImageProcessorFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SeeWriteAPI}/*/*'
+
+  QChatPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref QChatFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SeeWriteAPI}/*/*'
+
+  AudioGeneratorPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AudioGeneratorFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SeeWriteAPI}/*/*'
+
+  # API Gateway Deployment
+  APIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ProcessImageMethod
+      - ProcessImageOptionsMethod
+      - ChatMethod
+      - ChatOptionsMethod
+      - GenerateAudioMethod
+      - GenerateAudioOptionsMethod
+    Properties:
+      RestApiId: !Ref SeeWriteAPI
+      StageName: !Ref Environment
+
+Outputs:
+  APIGatewayURL:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${SeeWriteAPI}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Export:
+      Name: !Sub '${ProjectName}-api-url-${Environment}'
+
+  ImageProcessorFunctionArn:
+    Description: 'Image Processor Lambda Function ARN'
+    Value: !GetAtt ImageProcessorFunction.Arn
+    Export:
+      Name: !Sub '${ProjectName}-image-processor-arn-${Environment}'
+
+  QChatFunctionArn:
+    Description: 'Q&A Chat Lambda Function ARN'
+    Value: !GetAtt QChatFunction.Arn
+    Export:
+      Name: !Sub '${ProjectName}-qchat-arn-${Environment}'
+
+  AudioGeneratorFunctionArn:
+    Description: 'Audio Generator Lambda Function ARN'
+    Value: !GetAtt AudioGeneratorFunction.Arn
+    Export:
+      Name: !Sub '${ProjectName}-audio-generator-arn-${Environment}'
